@@ -27,3 +27,45 @@ HTML (index.html):
 </body>
 </html>
 ```
+
+JavaScript (script.js):
+```javascript
+document.getElementById('formPagamento').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    var estabelecimento = document.getElementById('estabelecimento').value;
+    var valor = document.getElementById('valor').value;
+
+    // Enviar dados para o servidor PHP
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'processar_pagamento.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // Redirecionar para o link de pagamento retornado pelo servidor
+            window.location.href = xhr.responseText;
+        }
+    };
+    xhr.send('estabelecimento=' + encodeURIComponent(estabelecimento) + '&valor=' + encodeURIComponent(valor));
+});
+
+```
+PHP (processar_pagamento.php):
+
+```php
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $estabelecimento = $_POST['estabelecimento'];
+    $valor = $_POST['valor'];
+
+    // Verifique e valide os dados conforme necessário
+
+    // Redirecione para o link de pagamento
+    $link_pagamento = "https://pay.infinitepay.io/{$estabelecimento}/{$valor}/";
+    echo $link_pagamento;
+} else {
+    http_response_code(405); // Método não permitido
+}
+?>
+
+```
